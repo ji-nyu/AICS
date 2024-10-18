@@ -55,21 +55,7 @@ def create_chain_for_role(vectorstore, role, question):
     llm = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key=openai_api_key)
     
     # 역할별 프롬프트 템플릿 설정
-    if role == "판사":
-        prompt_template = """
-        당신은 판사입니다. 공정한 재판이 이루어지도록 json 데이터를 기반으로 판결을 내리세요.
-        {context}
-        질문: {question}
-        판사의 답변:
-        """
-    elif role == "검사":
-        prompt_template = """
-        당신은 검사입니다. 사건의 범죄성을 강조하며 법적 처벌이 어떻게 이루어져야 하는지 설명해 주십시오.
-        {context}
-        질문: {question}
-        검사의 답변:
-        """
-    elif role == "변호사":
+    if role == "변호사":
         prompt_template = """
         당신은 변호사입니다. 피고인을 변호하며 어떻게 방어할지 설명해 주십시오.
         {context}
@@ -92,42 +78,3 @@ def create_chain_for_role(vectorstore, role, question):
     result = qa_chain({"query": question})
     
     return result
-
-# Streamlit 인터페이스
-###st.set_page_config(layout="wide")
-st.title("RAG Q&A 시스템")
-
-# 사용자 입력
-topic = st.text_input("시뮬레이션 주제를 입력하세요:")
-question = st.text_input("판례 입력:")
-
-if topic and question:
-    if st.button("답변 받기"):
-        with st.spinner("처리 중..."):
-            # 문서 로드 및 분할
-            json_file_path = "/home/a202021038/workspace/projects/hong/AICS/src/aics/RAG/law.json"
-            splits = load_docs_from_json(json_file_path)
-            
-            # 벡터 저장소 생성
-            vectorstore = create_vectorstore(splits)
-            
-            # 각 역할에 맞는 답변 생성
-            judge_result = create_chain_for_role(vectorstore, "판사", question)
-            prosecutor_result = create_chain_for_role(vectorstore, "검사", question)
-            lawyer_result = create_chain_for_role(vectorstore, "변호사", question)
-
-            # 대화 스타일로 출력
-            st.subheader("대화")
-            st.write("---")
-            st.markdown(f"**판사:** {judge_result['result']}")
-            st.write("---")
-            st.markdown(f"**검사:** {prosecutor_result['result']}")
-            st.write("---")
-            st.markdown(f"**변호사:** {lawyer_result['result']}")
-            st.write("---")
-            
-            # 출처 출력
-            st.subheader("출처:")
-            for doc in judge_result["source_documents"]:
-                st.write(doc.page_content)
-                st.write("---")

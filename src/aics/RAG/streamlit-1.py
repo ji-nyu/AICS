@@ -32,31 +32,31 @@ if topic and question:
     if st.button("답변 받기"):
         with st.spinner("처리 중..."):
             # 문서 로드 및 분할
-            json_file_path = "/home/a202021038/workspace/projects/hong/AICS/src/aics/RAG/law.json"
+            json_file_path = "/home/jinyu/AICS/src/aics/RAG/law.json"
             splits = load_docs_from_json(json_file_path)
             
             # 벡터 저장소 생성
             vectorstore = create_vectorstore(splits)
             
             # 각 역할별로 체인 생성 및 답변 받기
-            judge_result = create_chain_for_role(vectorstore, "판사", question)
-            prosecutor_result = create_chain_for_role(vectorstore, "검사", question)
+            #judge_result = create_chain_for_role(vectorstore, "판사", question)
+            #prosecutor_result = create_chain_for_role(vectorstore, "검사", question)
             lawyer_result = create_chain_for_role(vectorstore, "변호사", question)
 
             # 대화 스타일로 출력
             st.subheader("대화")
 
             # 판사 의견
-            st.markdown(bubble_style_judge.format(message=judge_result['result']), unsafe_allow_html=True)
+            #st.markdown(bubble_style_judge.format(message=judge_result['result']), unsafe_allow_html=True)
 
             # 검사 의견
-            st.markdown(bubble_style_prosecutor.format(message=prosecutor_result['result']), unsafe_allow_html=True)
+            #st.markdown(bubble_style_prosecutor.format(message=prosecutor_result['result']), unsafe_allow_html=True)
 
             # 변호사 의견
             st.markdown(bubble_style_lawyer.format(message=lawyer_result['result']), unsafe_allow_html=True)
 
             # 출처 출력
             st.subheader("출처:")
-            for doc in judge_result["source_documents"]:
+            for doc in lawyer_result["source_documents"]:
                 st.write(doc.page_content)
                 st.write("---")
